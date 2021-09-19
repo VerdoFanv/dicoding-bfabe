@@ -1,0 +1,6 @@
+node_modules
+.env
+.prod.env
+package-lock.json
+Proyek_2.zip
+syarat.docx
