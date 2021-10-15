@@ -1,0 +1,7 @@
+src/api/uploads/images
+node_modules
+.env
+.prod.env
+package-lock.json
+Proyek_3.zip
+syarat.docx
