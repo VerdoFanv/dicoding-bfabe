@@ -41,14 +41,19 @@ class SongsHandler {
     }
   }
 
-  async getSongsHandler() {
-    const getSongs = await this._service.getSongs()
+  async getSongsHandler({ query }, h) {
+    try {
+      const { title = '', performer = '' } = query
+      const getSongs = await this._service.getSongs({ title, performer })
 
-    return {
-      status: 'success',
-      data: {
-        songs: getSongs,
-      },
+      return {
+        status: 'success',
+        data: {
+          songs: getSongs,
+        },
+      }
+    } catch (error) {
+      return this._failedResponse(error, h)
     }
   }
 

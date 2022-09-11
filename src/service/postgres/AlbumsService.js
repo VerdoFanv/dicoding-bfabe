@@ -24,7 +24,7 @@ class AlbumsService {
   }
 
   async getAlbums() {
-    const result = this._pool.query('SELECT * FROM albums')
+    const result = this._pool.query('SELECT * FROM albums WHERE title LIKE ')
     return result.rows
   }
 
@@ -40,6 +40,23 @@ class AlbumsService {
     }
 
     return result.rows[0]
+  }
+
+  async getAlbumByIdWithSongs(id) {
+    const query = {
+      text: `
+        SELECT songs.id, songs.title, songs.performer FROM albums
+        LEFT JOIN songs ON songs.album_id = albums.id
+        WHERE albums.id = $1`,
+      values: [id],
+    }
+
+    const result = await this._pool.query(query)
+    if (!result.rowCount) {
+      throw new NotFoundError('Cannot find album ID!')
+    }
+
+    return result.rows
   }
 
   async editAlbumById(id, { name, year }) {
