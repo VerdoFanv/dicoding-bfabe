@@ -1,31 +1,47 @@
-require('dotenv').config();
+require('dotenv').config()
 
-const Hapi = require('@hapi/hapi');
-const songs = require('./api/songs');
-const SongsService = require('./service/postgres/SongsService');
-const SongsValidator = require('./validator/songs');
+const Hapi = require('@hapi/hapi')
 
-const initServer = async () => {
-    const server = Hapi.server({
-        host: process.env.HOST,
-        port: process.env.PORT,
-        routes: {
-            cors: {
-                origin: ['*'],
-            },
-        },
-    });
+// api
+const songs = require('./api/songs')
+const albums = require('./api/albums')
 
-    await server.register({
-        plugin: songs,
-        options: {
-            service: new SongsService(),
-            validator: SongsValidator,
-        },
-    });
+// service & validator
+const SongsService = require('./service/postgres/SongsService')
+const SongsValidator = require('./validator/songs')
+const AlbumsValidator = require('./validator/albums')
+const AlbumsService = require('./service/postgres/AlbumsService')
 
-    server.start();
-    console.log(`Server telah berjalan pada ${server.info.uri}`);
-};
+const startServer = async () => {
+  const server = Hapi.server({
+    host: process.env.HOST,
+    port: process.env.PORT,
+    routes: {
+      cors: {
+        origin: ['*'],
+      },
+    },
+  })
 
-initServer();
+  await server.register([
+    {
+      plugin: albums,
+      options: {
+        service: new AlbumsService(),
+        validator: AlbumsValidator,
+      },
+    },
+    {
+      plugin: songs,
+      options: {
+        service: new SongsService(),
+        validator: SongsValidator,
+      },
+    },
+  ])
+
+  server.start()
+  console.log(`Server telah berjalan pada ${server.info.uri}`)
+}
+
+startServer()
