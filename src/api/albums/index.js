@@ -4,9 +4,15 @@ const AlbumsHandler = require('./handler')
 module.exports = {
   name: 'albums',
   version: '1.0',
-  register: (server, { service, validator }) => {
+  register: (server, { 
+    albumsService, 
+    songsService,
+    validator 
+  }) => {
     const albumsHandler = new AlbumsHandler({
-      service, validator,
+      albumsService, 
+      songsService,
+      validator,
     })
 
     server.route(routes(albumsHandler))

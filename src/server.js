@@ -27,7 +27,8 @@ const startServer = async () => {
     {
       plugin: albums,
       options: {
-        service: new AlbumsService(),
+        albumsService: new AlbumsService(),
+        songsService: new SongsService(),
         validator: AlbumsValidator,
       },
     },

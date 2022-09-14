@@ -49,6 +49,21 @@ class SongsService {
     return result.rows.map(mapGetSong)[0]
   }
 
+  async getSongsByAlbumId(albumId) {
+    const query = {
+      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
+      values: [albumId],
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Not found album ID!')
+    }
+
+    return result.rows
+  }
+
   async editSongById(id, {
     title, year, performer, genre, duration, albumId,
   }) {
