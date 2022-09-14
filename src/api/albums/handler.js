@@ -37,7 +37,7 @@ class AlbumsHandler {
       const album = await this._albumsService.getAlbumById(id)
       const songs = await this._songsService.getSongsByAlbumId(id)
 
-      const response = h.response({
+      return {
         status: 'success',
         data: {
           album: {
@@ -45,9 +45,7 @@ class AlbumsHandler {
             songs,
           },
         },
-      })
-
-      return response
+      }
     } catch (error) {
       return this._failedResponse(error, h)
     }
@@ -59,12 +57,10 @@ class AlbumsHandler {
       const { id } = params
       await this._albumsService.editAlbumById(id, payload)
 
-      const response = h.response({
+      return {
         status: 'success',
         message: 'Album has beed updated!',
-      })
-
-      return response
+      }
     } catch (error) {
       return this._failedResponse(error, h)
     }
@@ -75,12 +71,10 @@ class AlbumsHandler {
       const { id } = params
       await this._albumsService.deleteAlbumById(id)
 
-      const response = h.response({
+      return {
         status: 'success',
         message: 'Album has beed deleted!',
-      })
-
-      return response
+      }
     } catch (error) {
       return this._failedResponse(error, h)
     }
