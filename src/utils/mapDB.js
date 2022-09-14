@@ -1,27 +1,13 @@
-const mapDBToModel = ({
-    // eslint-disable-next-line camelcase
-    id, title, year, performer, genre, duration, inserted_at, updated_at,
+const mapGetSong = ({
+  id, title, year, performer, genre, duration, album_id,
 }) => ({
-    id,
-    title,
-    year,
-    performer,
-    genre,
-    duration,
-    insertedAt: inserted_at,
-    updatedAt: updated_at,
-});
+  id,
+  title,
+  year,
+  performer,
+  genre,
+  duration,
+  albumId: album_id,
+})
 
-const mapGetSongs = ({ id, title, performer }) => ({
-    id,
-    title,
-    performer,
-});
-
-const mapGetPlaylists = ({ id, name, username }) => ({
-    id,
-    name,
-    username,
-});
-
-module.exports = { mapDBToModel, mapGetSongs, mapGetPlaylists };
+module.exports = { mapGetSong }
