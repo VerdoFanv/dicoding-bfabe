@@ -1,4 +1,4 @@
-const mapGetSong = ({
+const mapGetSongs = ({
   id, title, year, performer, genre, duration, album_id,
 }) => ({
   id,
@@ -10,4 +10,4 @@ const mapGetSong = ({
   albumId: album_id,
 })
 
-module.exports = { mapGetSong }
+module.exports = { mapGetSongs }

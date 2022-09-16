@@ -5,9 +5,17 @@ module.exports = {
   name: 'collaborations',
   version: '1.0.0',
   register: (server, {
-    collaborationsService, playlistsService, validator,
+    collaborationsService,
+    playlistsService,
+    usersService,
+    validator,
   }) => {
-    const collaborationsHandler = new CollaborationsHandler(collaborationsService, playlistsService, validator)
+    const collaborationsHandler = new CollaborationsHandler({
+      collaborationsService,
+      playlistsService,
+      usersService,
+      validator,
+    })
 
     server.route(routes(collaborationsHandler))
   },

@@ -6,12 +6,10 @@ module.exports = {
   version: '1.0',
   register: (server, {
     albumsService,
-    songsService,
     validator,
   }) => {
     const albumsHandler = new AlbumsHandler({
       albumsService,
-      songsService,
       validator,
     })
 

@@ -2,7 +2,7 @@ const { Pool } = require('pg')
 const { nanoid } = require('nanoid')
 const InvariantError = require('../../error/InvariantError')
 const NotFoundError = require('../../error/NotFoundError')
-const { mapGetSong } = require('../../utils/mapDB')
+const { mapGetSongs } = require('../../utils/mapDB')
 
 class SongsService {
   constructor() {
@@ -46,7 +46,7 @@ class SongsService {
       throw new NotFoundError('Not found music ID!')
     }
 
-    return result.rows.map(mapGetSong)[0]
+    return result.rows.map(mapGetSongs)[0]
   }
 
   async getSongsByAlbumId(albumId) {
@@ -56,11 +56,6 @@ class SongsService {
     }
 
     const result = await this._pool.query(query)
-
-    if (!result.rowCount) {
-      throw new NotFoundError('Not found album ID!')
-    }
-
     return result.rows
   }
 
@@ -89,6 +84,19 @@ class SongsService {
 
     if (!result.rowCount) {
       throw new NotFoundError('Failed to delete a music, ID not found!')
+    }
+  }
+
+  async verifyExistingSongById(id) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [id],
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Not found music ID!')
     }
   }
 }
