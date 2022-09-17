@@ -1,36 +1,35 @@
-const autoBind = require('auto-bind');
-const successResponse = require('../../utils/response');
-
 class ExportSongsHandler {
-    constructor({ exportsService, playlistsService, validator }) {
-        this._exportsService = exportsService;
-        this._playlistsService = playlistsService;
-        this._validator = validator;
+  constructor({ exportsService, playlistsService, validator }) {
+    this._exportsService = exportsService
+    this._playlistsService = playlistsService
+    this._validator = validator
 
-        autoBind(this);
+    this.postExportSongsHandler = this.postExportSongsHandler.bind(this)
+  }
+
+  async postExportSongsHandler({ payload, auth, params }, h) {
+    this._validator.validateExportSongsPayload(payload)
+
+    const { playlistId } = params
+    const { id: userId } = auth.credentials
+
+    await this._playlistsService.verifyPlaylistAccess(playlistId, userId)
+
+    const message = {
+      playlistId,
+      targetEmail: payload.targetEmail,
     }
 
-    async postExportSongsHandler(request, h) {
-        this._validator.validateExportSongsPayload(request.payload);
+    await this._exportsService.sendMessage('export:playlists', JSON.stringify(message))
 
-        const { playlistId: id } = request.params;
-        const { id: userId } = request.auth.credentials;
+    const response = h.response({
+      status: 'success',
+      message: 'Permintaan Anda sedang kami proses',
+    })
 
-        await this._playlistsService.verifyPlaylistAccess(id, userId);
-
-        const message = {
-            playlistId: id,
-            targetEmail: request.payload.targetEmail,
-        };
-
-        await this._exportsService.sendMessage('export:playlists', JSON.stringify(message));
-
-        return successResponse(h, {
-            status: 'success',
-            message: 'Permintaan Anda sedang kami proses',
-            statusCode: 201,
-        });
-    }
+    response.code(201)
+    return response
+  }
 }
 
-module.exports = ExportSongsHandler;
+module.exports = ExportSongsHandler

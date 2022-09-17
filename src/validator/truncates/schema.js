@@ -1,7 +1,7 @@
-const Joi = require('joi');
+const Joi = require('joi')
 
-const TruncateHeaderSchema = Joi.object({
-    'x-auth-token': Joi.string().required(),
-}).unknown();
+const TruncatePayloadSchema = Joi.object({
+  token: Joi.string().required(),
+})
 
-module.exports = { TruncateHeaderSchema };
+module.exports = { TruncatePayloadSchema }

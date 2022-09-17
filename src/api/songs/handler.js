@@ -1,78 +1,85 @@
-const autoBind = require('auto-bind');
-const successResponse = require('../../utils/response');
-
 class SongsHandler {
-    constructor(service, validator) {
-        this._service = service;
-        this._validator = validator;
+  constructor(service, validator) {
+    this._service = service
+    this._validator = validator
 
-        autoBind(this);
+    this.postSongHandler = this.postSongHandler.bind(this)
+    this.getSongsHandler = this.getSongsHandler.bind(this)
+    this.getSongByIdHandler = this.getSongByIdHandler.bind(this)
+    this.putSongByIdHandler = this.putSongByIdHandler.bind(this)
+    this.deleteSongByIdHandler = this.deleteSongByIdHandler.bind(this)
+  }
+
+  async postSongHandler(request, h) {
+    this._validator.validateSongPayload(request.payload)
+    const {
+      title = 'untitled', year, performer, genre, duration = null, albumId = null,
+    } = request.payload
+
+    const songId = await this._service.addSongs({
+      title,
+      year,
+      performer,
+      genre,
+      duration,
+      albumId,
+    })
+
+    const response = h.response({
+      status: 'success',
+      message: 'Lagu berhasil ditambahkan',
+      data: { songId },
+    })
+
+    response.code(201)
+    return response
+  }
+
+  async getSongsHandler({ query }) {
+    const { title = '', performer = '' } = query
+    const getSongs = await this._service.getSongs({ title, performer })
+
+    return {
+      status: 'success',
+      data: {
+        songs: getSongs,
+      },
     }
+  }
 
-    async postSongHandler({ payload }, h) {
-        this._validator.validateSongPayload(payload);
-        const {
-            title = 'untitled', year, performer, genre, duration,
-        } = payload;
+  async getSongByIdHandler({ params }) {
+    const { songId } = params
+    const getSong = await this._service.getSongById(songId)
 
-        const id = await this._service.addSongs({
-            title, year, performer, genre, duration,
-        });
-
-        return successResponse(h, {
-            message: 'Lagu berhasil ditambahkan',
-            data: {
-                songId: id,
-            },
-            statusCode: 201,
-        });
+    return {
+      status: 'success',
+      data: {
+        song: getSong,
+      },
     }
+  }
 
-    async getSongsHandler(request, h) {
-        const getSongs = await this._service.getSongs();
+  async putSongByIdHandler({ payload, params }) {
+    this._validator.validateSongPayload(payload)
+    const { songId } = params
 
-        return successResponse(h, {
-            data: {
-                songs: getSongs,
-            },
-        });
+    await this._service.editSongById(songId, payload)
+
+    return {
+      status: 'success',
+      message: 'song has been updated!',
     }
+  }
 
-    async getSongByIdHandler({ params }, h) {
-        const { songId } = params;
-        const getSong = await this._service.getSongById(songId);
+  async deleteSongByIdHandler({ params }) {
+    const { songId } = params
+    await this._service.deleteSongById(songId)
 
-        return successResponse(h, {
-            data: {
-                song: getSong,
-            },
-        });
+    return {
+      status: 'success',
+      message: 'song has been deleted!',
     }
-
-    async putSongByIdHandler(request, h) {
-        this._validator.validateSongPayload(request.payload);
-        const {
-            title, year, performer, genre, duration,
-        } = request.payload;
-        const { songId } = request.params;
-
-        await this._service.editSongById(songId, {
-            title, year, performer, genre, duration,
-        });
-
-        return successResponse(h, {
-            message: 'lagu berhasil diperbarui',
-        });
-    }
-
-    async deleteSongByIdHandler({ params }, h) {
-        const { songId } = params;
-        await this._service.deleteSongById(songId);
-
-        return successResponse(h, {
-            message: 'lagu berhasil dihapus',
-        });
-    }
+  }
 }
 
-module.exports = SongsHandler;
+module.exports = SongsHandler

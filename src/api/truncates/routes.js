@@ -1,9 +1,9 @@
 const routes = (handler) => [
-    {
-        method: 'DELETE',
-        path: '/truncate',
-        handler: handler.deleteAllTableHandler,
-    },
-];
+  {
+    path: '/truncate',
+    method: 'DELETE',
+    handler: handler.truncateAllTable,
+  },
+]
 
-module.exports = routes;
+module.exports = routes

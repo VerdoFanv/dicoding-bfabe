@@ -1,31 +1,27 @@
-require('dotenv').config();
-
-const autoBind = require('auto-bind');
-const AuthorizationError = require('../../error/AuthorizationError');
-const successResponse = require('../../utils/response');
+const InvariantError = require('../../error/InvariantError')
 
 class TruncateHandler {
-    constructor(service, validator) {
-        this._service = service;
-        this._validator = validator;
+  constructor(service, validator) {
+    this._service = service
+    this._validator = validator
 
-        autoBind(this);
+    this.truncateAllTable = this.truncateAllTable.bind(this)
+  }
+
+  async truncateAllTable({ payload }) {
+    this._validator.validatePayload(payload)
+    const { token } = payload
+    const myToken = process.env.MYTRUNCATE_TOKEN
+    if (token !== myToken) {
+      throw new InvariantError('Token Invalid')
     }
+    await this._service.truncateDB()
 
-    async deleteAllTableHandler({ headers }, h) {
-        await this._validator.validateTruncateHeaderSchema(headers);
-        const header = headers['x-auth-token'];
-
-        if (header !== process.env.API_KEY) {
-            throw new AuthorizationError('Gagal menghapus semua data tabel, Api Token salah!');
-        }
-
-        await this._service.deleteAllTable();
-
-        return successResponse(h, {
-            message: 'Berhasil menghapus semua data pada tabel...',
-        });
+    return {
+      status: 'success',
+      message: 'berhasil mentruncate semua data table',
     }
+  }
 }
 
-module.exports = TruncateHandler;
+module.exports = TruncateHandler
