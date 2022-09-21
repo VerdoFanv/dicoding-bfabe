@@ -4,7 +4,7 @@
   "description": "none",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon ./src/server.js",
+    "start": "nodemon ./src/server.js",
     "prod": "NODE_ENV=production node ./src/server.js",
     "consume": "node ./consumer/consume.js",
     "lint": "eslint ./src",
