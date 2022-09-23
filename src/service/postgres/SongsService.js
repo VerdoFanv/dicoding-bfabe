@@ -11,20 +11,18 @@ class SongsService {
   }
 
   async addSongs({
-    title, year, performer, genre, duration,
+    title, year, performer, genre, duration, albumId,
   }) {
-    const id = nanoid(16)
-    const insertedAt = new Date().toISOString()
-
+    const id = `song-${nanoid(16)}`
     const query = {
-      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7, $7) RETURNING id',
-      values: [`song-${id}`, title, year, performer, genre, duration, insertedAt],
+      text: 'INSERT INTO songs VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id',
+      values: [id, title, year, performer, genre, duration, albumId],
     }
 
     const result = await this._pool.query(query)
 
     if (!result.rows[0].id) {
-      throw new InvariantError('Music gagal ditambahkan')
+      throw new InvariantError('Failed to add music!')
     }
 
     await this._cacheControl.del('songs')
@@ -32,12 +30,14 @@ class SongsService {
     return result.rows[0].id
   }
 
-  async getSongs() {
+  async getSongs({ title, performer }) {
     try {
       const result = await this._cacheControl.get('songs')
       return JSON.parse(result)
     } catch (error) {
-      const result = await this._pool.query('SELECT id, title, performer FROM songs')
+      const query = `SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE LOWER('%${title}%') AND LOWER(performer) LIKE LOWER('%${performer}%')`
+
+      const result = await this._pool.query(query)
       await this._cacheControl.set('songs', JSON.stringify(result.rows), (60 * 30))
 
       return result.rows
@@ -61,19 +61,30 @@ class SongsService {
     return result.rows.map(mapDBToModel)[0]
   }
 
-  async editSongById(id, {
-    title, year, performer, genre, duration,
-  }) {
-    const updatedAt = new Date().toISOString()
+  async getSongsByAlbumId(albumId) {
     const query = {
-      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, updated_at = $6 WHERE id = $7 RETURNING id',
-      values: [title, year, performer, genre, duration, updatedAt, id],
+      text: 'SELECT id, title, performer FROM songs WHERE album_id = $1',
+      values: [albumId],
+    }
+
+    await this._cacheControl.del('songs')
+
+    const result = await this._pool.query(query)
+    return result.rows
+  }
+
+  async editSongById(id, {
+    title, year, performer, genre, duration, albumId,
+  }) {
+    const query = {
+      text: 'UPDATE songs SET title = $1, year = $2, performer = $3, genre = $4, duration = $5, album_id = $6 WHERE id = $7 RETURNING id',
+      values: [title, year, performer, genre, duration, albumId, id],
     }
 
     const result = await this._pool.query(query)
 
     if (!result.rowCount) {
-      throw new NotFoundError('Gagal memperbarui music. Id tidak ditemukan!')
+      throw new NotFoundError('Failed to update music, ID not found!')
     }
 
     await this._cacheControl.del('songs')

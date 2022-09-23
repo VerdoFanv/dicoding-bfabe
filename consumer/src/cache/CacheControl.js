@@ -6,7 +6,7 @@ const InvariantError = require('../error/InvariantError')
 class CacheControl {
   constructor() {
     this._client = redis.createClient({
-      host: process.env.REDIS_SERVER,
+      host: process.env.REDIS_SERVER_HOST,
     })
 
     this._client.on('error', (error) => {
