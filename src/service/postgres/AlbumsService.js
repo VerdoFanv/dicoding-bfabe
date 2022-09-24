@@ -28,12 +28,19 @@ class AlbumsService {
       throw new InvariantError('Failed to added album')
     }
 
+    await this._cacheControl.del('albums')
     return result.rows[0].id
   }
 
   async getAlbums() {
-    const result = this._pool.query('SELECT * FROM albums')
-    return result.rows
+    try {
+      const albums = await this._cacheControl.get('albums')
+      return JSON.parse(albums)
+    } catch {
+      const result = await this._pool.query('SELECT * FROM albums')
+      await this._cacheControl.set('albums', JSON.stringify(result.rows))
+      return result.rows
+    }
   }
 
   async getAlbumById(id) {
@@ -73,6 +80,7 @@ class AlbumsService {
     if (!result.rowCount) {
       throw new NotFoundError('Cannot find album ID!')
     }
+    await this._cacheControl.del('albums')
   }
 
   async editAlbumCoverById(id, filename) {
@@ -154,6 +162,8 @@ class AlbumsService {
     if (cover) {
       fs.unlink(`${this._coverUploadFolder}/${cover}`)
     }
+
+    await this._cacheControl.del('albums')
   }
 
   async getAlbumLikesCountByAlbumId(albumId) {

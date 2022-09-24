@@ -21,8 +21,7 @@ class CollaborationsService {
       throw new InvariantError('Gagal menambahkan kolaborasi')
     }
 
-    await this._cacheControl.del(`songs:${playlistId}`)
-    await this._cacheControl.del(`playlists:${userId}`)
+    await this._cacheControl.del('playlists')
 
     return result.rows[0].id
   }
@@ -39,8 +38,7 @@ class CollaborationsService {
       throw new InvariantError('Gagal menghapus kolaborasi')
     }
 
-    await this._cacheControl.del(`songs:${playlistId}`)
-    await this._cacheControl.del(`playlists:${userId}`)
+    await this._cacheControl.del('playlists')
   }
 
   async verifyCollaborator(playlistId, userId) {
