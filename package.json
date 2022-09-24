@@ -8,6 +8,7 @@
     "prod": "NODE_ENV=production node ./src/server.js",
     "consume": "node ./consumer/consume.js",
     "lint": "eslint ./src",
+    "lint:fix": "eslint --fix ./src",
     "migrate": "node-pg-migrate"
   },
   "keywords": [],

@@ -2,7 +2,7 @@ const { TruncatePayloadSchema } = require('./schema')
 const InvariantError = require('../../error/InvariantError')
 
 const TruncateValidator = {
-  validateTruncateHeaderSchema: (header) => {
+  validatePayload: (header) => {
     const validationResult = TruncatePayloadSchema.validate(header)
 
     if (validationResult.error) {

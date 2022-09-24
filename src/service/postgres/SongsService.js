@@ -26,22 +26,14 @@ class SongsService {
     }
 
     await this._cacheControl.del('songs')
-
     return result.rows[0].id
   }
 
   async getSongs({ title, performer }) {
-    try {
-      const result = await this._cacheControl.get('songs')
-      return JSON.parse(result)
-    } catch (error) {
-      const query = `SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE LOWER('%${title}%') AND LOWER(performer) LIKE LOWER('%${performer}%')`
+    const query = `SELECT id, title, performer FROM songs WHERE LOWER(title) LIKE LOWER('%${title}%') AND LOWER(performer) LIKE LOWER('%${performer}%')`
+    const result = await this._pool.query(query)
 
-      const result = await this._pool.query(query)
-      await this._cacheControl.set('songs', JSON.stringify(result.rows), (60 * 30))
-
-      return result.rows
-    }
+    return result.rows
   }
 
   async getSongById(id) {
@@ -56,8 +48,6 @@ class SongsService {
       throw new NotFoundError('Music tidak ditemukan')
     }
 
-    await this._cacheControl.del('songs')
-
     return result.rows.map(mapDBToModel)[0]
   }
 
@@ -67,9 +57,8 @@ class SongsService {
       values: [albumId],
     }
 
-    await this._cacheControl.del('songs')
-
     const result = await this._pool.query(query)
+    await this._cacheControl.set(`song:inAlbum:${albumId}`, JSON.stringify(result.rows))
     return result.rows
   }
 
@@ -86,8 +75,6 @@ class SongsService {
     if (!result.rowCount) {
       throw new NotFoundError('Failed to update music, ID not found!')
     }
-
-    await this._cacheControl.del('songs')
   }
 
   async deleteSongById(id) {
@@ -103,6 +90,19 @@ class SongsService {
     }
 
     await this._cacheControl.del('songs')
+  }
+
+  async verifyExistingSongById(id) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [id],
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Not found music ID!')
+    }
   }
 }
 

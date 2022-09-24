@@ -44,11 +44,6 @@ const _exports = require('./api/exports')
 const ProducerService = require('./service/exports/ProducerService')
 const ExportsValidator = require('./validator/exports')
 
-// uploads
-const uploads = require('./api/uploads')
-const UploadsService = require('./service/uploads/UploadsService')
-const UploadsValidator = require('./validator/uploads')
-
 // caching
 const CacheControl = require('./service/cache/CacheControl')
 
@@ -59,12 +54,12 @@ const TruncateService = require('./service/postgres/TruncateDBService')
 
 const initServer = async () => {
   const cacheControl = new CacheControl()
+  const albumsService = new AlbumsService({ coverUploadFolder: path.resolve(__dirname, process.env.UPLOADS_DIRECTORY), cacheControl })
   const songsService = new SongsService(cacheControl)
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
   const collaborationsService = new CollaborationsService(cacheControl)
   const playlistsService = new PlaylistsService({ collaborationsService, songsService: new SongsService(), cacheControl })
-  const uploadsService = new UploadsService(path.resolve(__dirname, process.env.UPLOADS_DIRECTORY))
 
   const server = Hapi.server({
     host: process.env.HOST,
@@ -106,7 +101,7 @@ const initServer = async () => {
     {
       plugin: albums,
       options: {
-        albumsService: new AlbumsService(),
+        albumsService,
         validator: AlbumsValidator,
       },
     },
@@ -148,6 +143,7 @@ const initServer = async () => {
       options: {
         collaborationsService,
         playlistsService,
+        usersService,
         validator: CollaborationsValidator,
       },
     },
@@ -157,13 +153,6 @@ const initServer = async () => {
         exportsService: ProducerService,
         playlistsService,
         validator: ExportsValidator,
-      },
-    },
-    {
-      plugin: uploads,
-      options: {
-        service: uploadsService,
-        validator: UploadsValidator,
       },
     },
     {

@@ -3,6 +3,7 @@ const { nanoid } = require('nanoid')
 const bcrypt = require('bcrypt')
 const InvariantError = require('../../error/InvariantError')
 const AuthenticationError = require('../../error/AuthenticationError')
+const NotFoundError = require('../../error/NotFoundError')
 
 class UsersService {
   constructor() {
@@ -38,6 +39,19 @@ class UsersService {
 
     if (result.rowCount > 0) {
       throw new InvariantError('Gagal menambahkan User baru, Username sudah ada')
+    }
+  }
+
+  async verifyExistingUserWithUserId(id) {
+    const query = {
+      text: 'SELECT id FROM users WHERE id = $1',
+      values: [id],
+    }
+
+    const result = await this._pool.query(query)
+
+    if (!result.rowCount) {
+      throw new NotFoundError('Not found music ID!')
     }
   }
 

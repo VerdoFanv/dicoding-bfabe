@@ -1,12 +1,10 @@
-require('dotenv').config()
-
 const nodemailer = require('nodemailer')
 
 class MailSender {
   constructor() {
     this._transporter = nodemailer.createTransport({
-      host: 'smtp.mailtrap.io',
-      port: 2525,
+      host: process.env.MAIL_HOST,
+      port: process.env.MAIL_PORT,
       auth: {
         user: process.env.MAIL_ADDRESS,
         pass: process.env.MAIL_PASSWORD,
@@ -19,7 +17,7 @@ class MailSender {
       from: 'Openmusic API',
       to: targetEmail,
       subject: 'Ekspor Playlists',
-      text: 'Hasil export Playlist dapat dilihat dibawah sini...',
+      text: 'Export Playlists Data',
       attachments: [
         {
           filename: 'playlists.json',
