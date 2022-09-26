@@ -1,5 +1,3 @@
-require('dotenv').config()
-
 const redis = require('redis')
 const InvariantError = require('../../error/InvariantError')
 
@@ -7,7 +5,7 @@ class CacheControl {
   constructor() {
     this._client = redis.createClient({
       socket: {
-        host: process.env.REDIS_SERVER_HOST,
+        host: process.env.REDIS_SERVER,
       },
     })
 
@@ -18,7 +16,7 @@ class CacheControl {
     this._client.connect()
   }
 
-  async set(key, value, expInSec = 900) {
+  async set(key, value, expInSec = 1800) {
     await this._client.set(key, value, {
       EX: expInSec,
     })
