@@ -47,14 +47,9 @@ const ExportsValidator = require('./validator/exports')
 // caching
 const CacheControl = require('./service/cache/CacheControl')
 
-// truncates
-const truncate = require('./api/truncate')
-const truncateValidator = require('./validator/truncate')
-const TruncateService = require('./service/postgres/TruncateDBService')
-
 const initServer = async () => {
   const cacheControl = new CacheControl()
-  const albumsService = new AlbumsService({ coverUploadFolder: path.resolve(__dirname, process.env.UPLOADS_DIRECTORY), cacheControl })
+  const albumsService = new AlbumsService({ coverUploadFolder: path.resolve(__dirname, 'storage/album'), cacheControl })
   const songsService = new SongsService(cacheControl)
   const usersService = new UsersService()
   const authenticationsService = new AuthenticationsService()
@@ -153,13 +148,6 @@ const initServer = async () => {
         exportsService: ProducerService,
         playlistsService,
         validator: ExportsValidator,
-      },
-    },
-    {
-      plugin: truncate,
-      options: {
-        service: TruncateService,
-        validator: truncateValidator,
       },
     },
   ])
