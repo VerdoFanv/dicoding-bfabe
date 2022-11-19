@@ -1,5 +1,1 @@
 node_modules
-.env
-.prod.env
-*.zip
-syarat.docx
