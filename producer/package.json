@@ -6,7 +6,6 @@
   "scripts": {
     "start": "nodemon ./src/server.js",
     "prod": "NODE_ENV=production node ./src/server.js",
-    "consume": "node ./consumer/consume.js",
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "migrate": "node-pg-migrate"
@@ -31,7 +30,6 @@
     "joi": "^17.6.0",
     "nanoid": "^3.1.20",
     "node-pg-migrate": "^6.2.2",
-    "nodemailer": "^6.7.8",
     "pg": "^8.8.0",
     "redis": "^4.3.1"
   }
