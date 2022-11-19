@@ -1,6 +1,2 @@
-src/storage/albums
+producer/src/storage/albums
 node_modules
-.env
-.prod.env
-*.zip
-syarat.docx
